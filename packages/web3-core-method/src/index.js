@@ -179,7 +179,7 @@ Method.prototype.formatOutput = function (result) {
 Method.prototype.toPayload = function (args) {
     var call = this.getCall(args);
     var callback = this.extractCallback(args);
-    
+
     var params = this.formatInput(args);
     this.validateArgs(params);
 
@@ -627,7 +627,10 @@ Method.prototype.buildCall = function () {
                 if (!err && method.isRevertReasonString(result)){
                     reasonData = result.substring(10);
                 } else if (err && err.data){
-                    reasonData = err.data.substring(10);
+                    if (err.data instanceof Object)
+                        reasonData = err.data.data.substring(10);
+                    else
+                        reasonData = err.data.substring(10);
                 }
 
                 if (reasonData){
@@ -689,7 +692,7 @@ Method.prototype.buildCall = function () {
         // SENDS the SIGNED SIGNATURE
         var sendSignedTx = function (sign) {
 
-            var signedPayload = { ... payload, 
+            var signedPayload = { ... payload,
                 method: 'eth_sendRawTransaction',
                 params: [sign.rawTransaction]
             };
